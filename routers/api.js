@@ -21,7 +21,17 @@ mongoose.connect(config.database)
 
 router.route('/authenticate')
 .get((req, res) => {
-  return res.status(200).json({ message: 'Hello world' })
+  const token = req.headers.token
+
+  if (!token)
+    return res.status(403).json({ error: { message: 'No token provided' } })
+
+  jwt.verify(token, config.secret, (error, decoded) => {
+    if (error)
+      return res.status(403).json({ error })
+
+    res.status(200).json({ message: 'Valid token' })
+  })
 })
 .post((req, res) => {
 
@@ -38,8 +48,12 @@ router.route('/authenticate')
     if (user.comparePassword(user.password, password+config.secret) || !user)
       return res.status(401).json({ error: { message: 'Wrong user or password' }})
 
-    const token = jwt.sign({ _id: user._id }, config.secret, { expiresIn: 604800000 })
-    res.status(200).json({ message: 'Authenticated', token })
+    const _id = user._id
+    const token = jwt.sign({ _id }, config.secret, { expiresIn: 604800000 })
+
+    user.password = undefined //Remove password
+
+    res.status(200).json({ message: 'Authenticated', token, user })
   })
 })
 
@@ -94,8 +108,7 @@ router.use((req, res, next) => {
     return res.status(403).json({ error: { message: 'No token provided' } })
 
   jwt.verify(token, config.secret, (err, decoded) => {
-    if (err)
-      return res.status(401).json({ message: 'Failed to authenticate token'}) //End next requests and send a 401 (unauthorized)
+    if (err) return res.status(401).json({ message: 'Failed to authenticate token'}) //End next requests and send a 401 (unauthorized)
 
     req.U_ID = decoded._id
     next()
@@ -120,6 +133,7 @@ router.route('/sales')
 })
 .post((req, res) => {
   const { seller, product, quantity, location, type, client } = req.body.sale
+
   if (!client || !product || !quantity || !location)
     return res.status(400).json({ error: { message: 'Some paramteres are missing' } })
 
@@ -186,12 +200,14 @@ router.route('/products')
 
 router.route('/products/:product_id')
 .get((req, res) => {
-  const { product_id } = req.params
+  const product_id = req.params.product_id
+
   Product.findById(product_id)
   .exec((error, product) => {
     if (error) return res.status(500).json({ error })
     res.status(201).json({ product })
   })
+
 })
 
 module.exports = router
