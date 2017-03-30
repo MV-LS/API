@@ -17,12 +17,9 @@ const schema = new Schema({
 schema.methods.comparePassword = (hash, password) => {
   bcrypt.compare(password, hash)
   .then((res) => {
-    console.log(password, hash)
-    console.log(res)
     return res
   })
   .catch((error) => {
-    console.log(error)
     return false
   })
 }
