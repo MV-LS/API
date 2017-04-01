@@ -129,6 +129,15 @@ router.route('/users')
   })
 })
 
+router.route('/users/self')
+.get((req, res) => {
+  User.findById(req.U_ID, '-password')
+  .exec((error, user) => {
+    if (error) return res.status(500).json({ error })
+    res.status(201).json({ user })
+  })
+})
+
 
 /*
 
@@ -166,12 +175,13 @@ router.route('/sales')
     getProductPrice(product, (error) => {
       return res.status(500).json({ error })
     }, (price) => {
-      User.findByIdAndUpdate(seller, { $inc: { credit:  price*0.1}}, { new: true })
+      User.findByIdAndUpdate(seller, { $inc: { credit:  price*quantity*0.1}}, { new: true })
       .exec((error, user) => {
         if (error) return res.status(500).json({ error })
       })
     })
   }
+
 
   new Sale({
     client,
@@ -183,7 +193,11 @@ router.route('/sales')
   })
   .save((error, sale) => {
     if (error) return res.status(500).json({ error })
-    res.status(201).json({ message: 'Sale created', sale })
+    Product.findByIdAndUpdate(product, { $inc: { stock: -quantity }}, { new: true })
+    .exec((error, product) => {
+      if (error) return res.status(500).json({ error })
+      res.status(201).json({ message: 'Sale created', sale })
+    })
   })
 })
 
