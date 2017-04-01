@@ -11,7 +11,7 @@ const schema = new Schema({
     password: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     username: { type: String, required: true, unique: true},
-    credit: Number
+    credit: { type: Number, default: 0 }
 })
 
 schema.methods.comparePassword = (hash, password) => {
