@@ -14,13 +14,13 @@ const schema = new Schema({
     credit: { type: Number, default: 0 }
 })
 
-schema.methods.comparePassword = (hash, password) => {
-  bcrypt.compare(password, hash)
-  .then((res) => {
-    return res
+schema.methods.comparePassword = function (password, callback) {
+  bcrypt.compare(password, this.password)
+  .then((isMatch) => {
+    callback(isMatch)
   })
   .catch((error) => {
-    return false
+    callback(false)
   })
 }
 

@@ -47,15 +47,21 @@ router.route('/authenticate')
     if (error)
       res.status(500).json({ error })
 
-    if (user.comparePassword(user.password, password+config.secret) || !user)
-      return res.status(401).json({ error: { message: 'Wrong user or password' }})
 
-    const _id = user._id
-    const token = jwt.sign({ _id }, config.secret, { expiresIn: 604800000 })
+    if (!user)
+      return res.status(403).json({ error: { message: 'Wrong user or password' }})
 
-    user.password = undefined //Remove password
+      user.comparePassword(password+config.secret, (isMatch) => {
+        if (!isMatch) return res.status(401).json({ error: { message: 'Wrong user or password' }})
+        
+        const _id = user._id
+        const token = jwt.sign({ _id }, config.secret, { expiresIn: 604800000 })
 
-    res.status(200).json({ message: 'Authenticated', token, user })
+        user.password = undefined //Remove password
+
+        res.status(200).json({ message: 'Authenticated', token, user })
+      })
+
   })
 })
 
