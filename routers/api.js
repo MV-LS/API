@@ -251,16 +251,6 @@ router.route('/sales/:sale_id')
     res.status(201).json({ sale })
   })
 })
-.delete((req, res) => {
-  const sale_id = req.params.sale_id
-
-  Product.findById(sale_id)
-  .remove()
-  .exec((error) => {
-    if (error) return res.status(500).json({ error })
-    res.status(200).json({ message: 'Succesfully deleted'})
-  })
-})
 
 /*
 
@@ -305,6 +295,38 @@ router.route('/products/:product_id')
   })
 
 })
+
+/*
+
+  ADMIN FILTER
+
+*/
+
+router.use((req, res, next) => {
+
+  User.findById(req.U_ID, '-password')
+  .exec((error, user) => {
+    if (error) return res.status(500).json({ error })
+    if (user.access != 2)
+      return res.status(403).json({error: {message: 'Not authorized'}})
+    next()
+  })
+
+})
+
+router.route('/sales/:sale_id')
+.delete((req, res) => {
+  const sale_id = req.params.sale_id
+
+  Product.findById(sale_id)
+  .remove()
+  .exec((error) => {
+    if (error) return res.status(500).json({ error })
+    res.status(200).json({ message: 'Succesfully deleted'})
+  })
+})
+
+router.route('/products/:product_id')
 .delete((req, res) => {
   const product_id = req.params.product_id
 
