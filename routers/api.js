@@ -213,6 +213,16 @@ const objectIdWithTimestamp = (timestamp) => {
     return ObjectId(`${hexSeconds}0000000000000000`) // Create an ObjectId with that hex timestamp
 }
 
+router.route('/sales/locations')
+.get((req, res) => {
+  Sale.find({})
+  .select('location')
+  .exec((err, sales) => {
+    if (error) return res.status(500).json({ error })
+    res.status(201).json({ sales })
+  })
+})
+
 router.route('/sales/year=:year?&month=:month?')
 .get((req, res) => {
   const { year, month } = req.params
