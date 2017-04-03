@@ -217,7 +217,7 @@ router.route('/sales/locations')
 .get((req, res) => {
   Sale.find({})
   .select('location')
-  .exec((err, sales) => {
+  .exec((error, sales) => {
     if (error) return res.status(500).json({ error })
     res.status(201).json({ sales })
   })
