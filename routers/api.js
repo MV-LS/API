@@ -53,7 +53,7 @@ router.route('/authenticate')
 
       user.comparePassword(password+config.secret, (isMatch) => {
         if (!isMatch) return res.status(401).json({ error: { message: 'Wrong user or password' }})
-        
+
         const _id = user._id
         const token = jwt.sign({ _id }, config.secret, { expiresIn: 604800000 })
 
@@ -172,11 +172,12 @@ router.route('/sales')
   const { product, quantity, location, type, client } = req.body.sale
   let { seller } = req.body.sale
 
-  if (!client || !product || !quantity || !location)
+  if (!product || !quantity || !location)
     return res.status(400).json({ error: { message: 'Some paramteres are missing' } })
 
   if (type === 1) {
     seller = req.U_ID
+
     // Setup seller commision and stuff
     getProductPrice(product, (error) => {
       return res.status(500).json({ error })
