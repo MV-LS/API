@@ -187,6 +187,8 @@ router.route('/sales')
         if (error) return res.status(500).json({ error })
       })
     })
+  } else {
+    client = req.U_ID
   }
 
 
