@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "debug": "DEBUG=express:* nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,7 @@
     "express": "^4.15.2",
     "helmet": "^3.5.0",
     "jsonwebtoken": "^7.3.0",
-    "mongoose": "^4.9.2"
+    "mongoose": "^4.9.2",
+    "morgan": "^1.8.1"
   }
 }
