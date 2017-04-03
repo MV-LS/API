@@ -169,8 +169,9 @@ router.route('/sales')
   })
 })
 .post((req, res) => {
-  const { product, quantity, location, type, client } = req.body.sale
-  let { seller } = req.body.sale
+  const { product, quantity, location, type } = req.body.sale
+  let { seller, client } = req.body.sale
+
 
   if (!product || !quantity || !location)
     return res.status(400).json({ error: { message: 'Some paramteres are missing' } })
@@ -190,7 +191,6 @@ router.route('/sales')
   } else {
     client = req.U_ID
   }
-
 
   new Sale({
     client,
